@@ -8,7 +8,7 @@ import { useEffect } from 'react'
 
 const Sidebar = () => {
 
-  const {getUsers, users, selectedUser, setSelectedUse, unseenMessages, setUnseenMessages} = useContext(ChatContext);
+  const {getUsers, users, selectedUser, setSelectedUser, unseenMessages, setUnseenMessages} = useContext(ChatContext);
 
    const {logout, onlineusers} = useContext(AuthContext)
 
@@ -16,7 +16,7 @@ const Sidebar = () => {
 
   const navigate = useNavigate();
 
-  const filteredUsers = input ? users.filter((users)=>user.fullName.toLowerCase().includes(input.toLowerCase())) : users;
+  const filteredUsers = input ? users?.filter((user)=>user?.fullName?.toLowerCase().includes(input.toLowerCase())) : users;
 
     useEffect(()=>{
       getUsers();
@@ -45,7 +45,7 @@ const Sidebar = () => {
       </div>
 
       <div className='flex flex-col'>
-         {filteredUsers.map((user, index)=> (
+         {filteredUsers?.map((user, index)=> (
           <div onClick={()=> {
             setSelectedUser(user); setUnseenMessages(prev=>({...prev, [user._id]:0}))}}
            key={index} className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm ${selectedUser?._id === user._id && 'bg-[#282142]/50'}`}> 
@@ -53,7 +53,7 @@ const Sidebar = () => {
             <div className='flex flex-col leading-5'>
              <p>{user.fullName}</p>
              {
-              onlineusers.includes(user._id)
+              onlineusers?.includes(user._id.toString())
               ?<span className='text-green-400 text-xs'>online</span>
               :<span className='text-neutral-400 text-xs'>offline</span>
              }
