@@ -3,7 +3,7 @@ import assets from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
-const ProfilePage = () => {
+export const ProfilePage = () => {
 
  const {authUser, updateProfile} = useContext(AuthContext)
 
