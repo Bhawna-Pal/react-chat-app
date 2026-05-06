@@ -3,7 +3,7 @@ import assets from '../assets/assets';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 
-export const profilePage = () => {
+export const ProfilePage = () => {
 
  const {authUser, updateProfile} = useContext(AuthContext)
 
@@ -60,4 +60,4 @@ const handleSubmit = async(e)=>{
   )
 }
 
-export default profilePage
+export default ProfilePage
