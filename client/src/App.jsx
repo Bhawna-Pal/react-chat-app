@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
-import { ProfilePage } from './pages/ProfilePage'
+import { profilePage } from './pages/profilePage'
 import { Toaster } from 'react-hot-toast'
 import { AuthContext } from '../context/AuthContext'
 
@@ -63,7 +63,7 @@ const App = () => {
           path='/profile'
           element={
             authUser
-              ? <ProfilePage />
+              ? <profilePage />
               : <Navigate to="/login" />
           }
         />
