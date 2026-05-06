@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
-import { ProfilePage }from '/pages/ProfilePage'
+import { ProfilePage } from './pages/ProfilePage'
 import { Toaster } from 'react-hot-toast'
 import { AuthContext } from '../context/AuthContext'
 
