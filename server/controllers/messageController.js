@@ -93,3 +93,37 @@ export const sendMessage = async (req, res)=>{
         res.json({success: false, message: error.message}) 
     }
 }
+//  clear chat 
+export const clearMessages = async (req, res) =>{
+    try {
+        const {id: selectedUserId } = req.params;
+        const myId = req.user._id;
+
+        await Message.deleteMany({
+            $or: [
+                { sender: myId, receiverId: selectedUserId},
+                {senderId: selectedUserId, receiverId: myId}
+            ]
+        });
+        res.json({success: true, message: "Chat cleared successfully"});
+    } catch (error) {
+        res.json({success: false, message: error.message});
+    }
+}
+
+// Delete chat
+export const deleteChat = async (req, res) =>{
+    try {
+        const {id: selectedUserId } = req.params;
+        const myId = req.user._id;
+        await Message.deleteMany({
+            $or: [
+                {senderId: myId, receiverId: selectedUserId},
+                {senderId: selectedUserId, receiverId: myId}
+            ]
+        });
+        res.json({success: true, message: "Chat deleted" });
+    } catch (error) {
+        res.json({success: false, message: error.message});
+    }
+}

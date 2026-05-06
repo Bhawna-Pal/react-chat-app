@@ -53,6 +53,37 @@ export const ChatProvider = ({ children })=>{
             }
         }
 
+        //  function to clear messages to selected user
+
+        const clearChat = async (userId) =>{
+            try {
+                const { data } = await axios.delete(`/api/messages/clear/${userId}`);
+                if(data.success){
+                    setMessages([]);
+                    toast.success("Chat cleared");
+                }
+            } catch (error) {
+                toast.error(error.message);
+            }
+        }
+
+        //  function to delete messages to selected user
+
+        const deleteChat = async (userId) => {
+            try {
+                const { data } = await axios.delete(`api/messages/delete/${userId}`);
+                if (data.success){
+                    setMessages([]);
+                    setSelectedUser(null);
+                    setUsers(prev => prev.filter(u => u._id !== userId));
+                    toast.success("Chat deleted");
+                }
+            } catch (error) {
+                toast.error(error.message);
+                
+            }
+        }
+
         // function to subscribe to messages for selected user
         const subscribeToMessages = ()=>{
             if(!socket) return;
@@ -83,7 +114,7 @@ export const ChatProvider = ({ children })=>{
         },[socket, selectedUser])
 
          const value = {
-          messages, users, selectedUser, getUsers, getMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages
+          messages, users, selectedUser, getUsers, getMessages, sendMessage, setSelectedUser, unseenMessages, setUnseenMessages, clearChat, deleteChat
         }
 
     return ( 

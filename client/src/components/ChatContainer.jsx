@@ -12,7 +12,7 @@ import { MdOutlineEmojiEmotions, MdInfoOutline, MdDeleteOutline, MdBlock } from 
 import { AiOutlineClear } from "react-icons/ai"
 
 const ChatContainer = ({ openProfile, darkMode }) => {
-  const { messages, selectedUser, setSelectedUser, sendMessage, getMessages } = useContext(ChatContext)
+  const { messages, selectedUser, setSelectedUser, sendMessage, getMessages, clearChat, deleteChat } = useContext(ChatContext)
   const { authUser, onlineusers } = useContext(AuthContext)
 
   const scrollEnd = useRef()
@@ -81,16 +81,59 @@ const ChatContainer = ({ openProfile, darkMode }) => {
               onClick={() => setMenuOpen(!menuOpen)} 
             />
             
-            {menuOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#233138] rounded-lg shadow-xl border dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in duration-200">
-                <MenuOption icon={<MdInfoOutline />} text="Contact info" onClick={() => { setMenuOpen(false); openProfile(); }} />
-                <MenuOption icon={<AiOutlineClear />} text="Clear chat" onClick={() => setMenuOpen(false)} />
-                <MenuOption icon={<MdDeleteOutline />} text="Delete chat" danger onClick={() => setMenuOpen(false)} />
-                <MenuOption icon={<MdBlock />} text="Block user" danger onClick={() => setMenuOpen(false)} />
-                <hr className="my-1 border-gray-100 dark:border-gray-700" />
-                <MenuOption icon={<IoClose />} text="Close chat" onClick={() => setSelectedUser(null)} />
-              </div>
-            )}
+           {menuOpen && (
+  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#233138] rounded-lg shadow-xl border dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in duration-200">
+    <MenuOption 
+      icon={<MdInfoOutline />} 
+      text="Contact info" 
+      onClick={() => { setMenuOpen(false); openProfile(); }} 
+    />
+
+    {/* ✅ Clear Chat Logic */}
+    <MenuOption 
+      icon={<AiOutlineClear />} 
+      text="Clear chat" 
+      onClick={() => {
+        if (window.confirm("Are you sure you want to clear all messages?")) {
+          clearChat(selectedUser._id);
+        
+        setMenuOpen(false);
+        }
+      }} 
+    />
+
+    {/* ✅ Delete Chat Logic */}
+    <MenuOption 
+      icon={<MdDeleteOutline />} 
+      text="Delete chat" 
+      danger 
+      onClick={() => {
+        if (window.confirm("Are you sure you want to delete this chat and remove the user?")) {
+          deleteChat(selectedUser._id);
+        }
+        setMenuOpen(false);
+      }} 
+    />
+
+    <MenuOption 
+      icon={<MdBlock />} 
+      text="Block user" 
+      danger 
+      onClick={() => setMenuOpen(false)} 
+    />
+
+    <hr className="my-1 border-gray-100 dark:border-gray-700" />
+    
+    <MenuOption 
+      icon={<IoClose />} 
+      text="Close chat" 
+      onClick={() => {
+        setSelectedUser(null);
+        setMenuOpen(false);
+      }} 
+    />
+  </div>
+)}
           </div>
         </div>
       </div>
