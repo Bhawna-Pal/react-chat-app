@@ -39,6 +39,16 @@ export const login = async (req, res)=>{
         const { fullName, email, password, bio } = req.body;
         const userData = await User.findOne({email})
 
+         // ❗ Check if user exists
+    if (!userData) {
+      return res.json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    // 🔐 Compare password
+    
         const isPasswordCorrect = await bcrypt.compare(password, userData.password);
 
         if(!isPasswordCorrect){

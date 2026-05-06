@@ -1,70 +1,172 @@
-import React, { useContext } from 'react'
-import assets from '../assets/assets'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useEffect, useState, useRef } from 'react'
+import assets from '../assets/assets.js'
 import { AuthContext } from '../../context/AuthContext'
 import { ChatContext } from '../../context/ChatContext'
-import { useState } from 'react'
-import { useEffect } from 'react'
+
+// Icons
+import { FiMoreVertical } from "react-icons/fi"
+import { MdGroupAdd, MdStarBorder, MdMarkChatRead } from "react-icons/md"
+import { BsChatDots } from "react-icons/bs"
+import { IoLockClosedOutline, IoLogOutOutline, IoSearchOutline } from "react-icons/io5"
 
 const Sidebar = () => {
 
-  const {getUsers, users, selectedUser, setSelectedUser, unseenMessages, setUnseenMessages} = useContext(ChatContext);
+  const { getUsers, users, selectedUser, setSelectedUser, unseenMessages, setUnseenMessages } = useContext(ChatContext)
+  const { logout, onlineusers } = useContext(AuthContext)
 
-   const {logout, onlineusers} = useContext(AuthContext)
+  const [input, setInput] = useState("")
+  const [menuOpen, setMenuOpen] = useState(false)
 
-   const [input, setInput] = useState(false)
+  const menuRef = useRef()
 
-  const navigate = useNavigate();
+  const filteredUsers = input
+    ? users?.filter(user =>
+        user?.fullName?.toLowerCase().includes(input.toLowerCase())
+      )
+    : users
 
-  const filteredUsers = input ? users?.filter((user)=>user?.fullName?.toLowerCase().includes(input.toLowerCase())) : users;
+  useEffect(() => {
+    getUsers()
+  }, [onlineusers])
 
-    useEffect(()=>{
-      getUsers();
-    },[onlineusers])
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
 
   return (
-    <div className={`bg-[#8185B2]/10 h-full p-5 rounded-r-xl overflow-y-scroll text-white ${selectedUser ? 'max-md:hidden' : ''}`}>
-      <div className='pb-5'>
-        <div className='flex justify-between items-center'>
-          <img src={assets.logo} alt="logo" className='max-w-40' />
-          <div className='relative py-2 group'>
-            <img src={assets.menu_icon} alt="Menu" className='max-h-5 cursor-pointer' />
-            <div className='absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 hidden group-hover:block'>
-              <p onClick={() => navigate('/profile')} className='cursor-pointer text-sm '>Edit Profile</p>
-              <hr className='my-2 border-t border-gray-500' />
-              <p onClick={ ()=> logout()} className='cursor-pointer text-sm'>Logout</p>
-            </div>
+    <div className={`h-full flex flex-col 
+      bg-white dark:bg-[#111b21] 
+      text-black dark:text-white 
+      ${selectedUser ? 'max-md:hidden' : ''}`}>
+
+      {/* 🔝 HEADER */}
+      <div className="flex items-center justify-between px-4 py-3">
+
+        <h2 className="text-xl font-bold text-purple-600">
+          SyncTalk
+        </h2>
+
+        <div className="relative" ref={menuRef}>
+          <FiMoreVertical
+            size={20}
+            className="cursor-pointer text-gray-600 dark:text-gray-300"
+            onClick={() => setMenuOpen(!menuOpen)}
+          />
+
+          <div className={`
+            absolute right-0 mt-2 w-56 rounded-xl shadow-lg z-50
+            bg-white dark:bg-[#202c33]
+            transition-all duration-200 origin-top-right
+            ${menuOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"}
+          `}>
+
+            <MenuItem icon={<MdGroupAdd />} text="New group" />
+            <MenuItem icon={<MdStarBorder />} text="Starred messages" />
+            <MenuItem icon={<BsChatDots />} text="Select chats" />
+            <MenuItem icon={<MdMarkChatRead />} text="Mark all as read" />
+            <MenuItem icon={<IoLockClosedOutline />} text="App lock" />
+
+            <div className="h-[1px] bg-gray-100 dark:bg-[#2a3942] my-1" />
+
+            <MenuItem
+              icon={<IoLogOutOutline />}
+              text="Logout"
+              danger
+              onClick={logout}
+            />
           </div>
         </div>
+      </div>
 
-        <div className='bg-[#282142] rounded-full flex items-center gap-2 py-3 px-4 mt-5'>
-          <img src={assets.search_icon} alt="Search"  className='w-3' />
-          <input onChange={(e)=>setInput(e.target.value)} type="text" className='bg-transparent border-none outline-none text-white text-xs placeholder:-[#c8c8c8] flex-1' placeholder='Search User...' />
+      {/* 🔍 SEARCH */}
+      <div className="px-3 pb-3">
+        <div className="flex items-center rounded-full px-3 py-2
+          bg-gray-100 dark:bg-[#202c33]">
+          
+          <IoSearchOutline className="text-gray-500 mr-2" size={18} />
+          
+          <input
+            onChange={(e) => setInput(e.target.value)}
+            type="text"
+            placeholder="Search or start new chat"
+            className="bg-transparent outline-none text-sm w-full 
+            text-gray-700 dark:text-gray-200 
+            placeholder-gray-400"
+          />
         </div>
-
       </div>
 
-      <div className='flex flex-col'>
-         {filteredUsers?.map((user, index)=> (
-          <div onClick={()=> {
-            setSelectedUser(user); setUnseenMessages(prev=>({...prev, [user._id]:0}))}}
-           key={index} className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm ${selectedUser?._id === user._id && 'bg-[#282142]/50'}`}> 
-            <img src={user?.profilePic || assets.avatar_icon} alt="" className='w-[35px] aspect-[1/1] rounded-b-full'/>
-            <div className='flex flex-col leading-5'>
-             <p>{user.fullName}</p>
-             {
-              onlineusers?.includes(user._id.toString())
-              ?<span className='text-green-400 text-xs'>online</span>
-              :<span className='text-neutral-400 text-xs'>offline</span>
-             }
+      {/* 👥 USERS */}
+      <div className="flex-1 overflow-y-auto">
+
+        {filteredUsers?.map((user, index) => (
+          <div
+            key={index}
+            onClick={() => {
+              setSelectedUser(user)
+              setUnseenMessages(prev => ({ ...prev, [user._id]: 0 }))
+            }}
+            className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition
+            ${selectedUser?._id === user._id
+              ? 'bg-purple-50 dark:bg-[#2a3942]'
+              : 'hover:bg-gray-50 dark:hover:bg-[#202c33]'
+            }`}
+          >
+
+            <img
+              src={user?.profilePic || assets.avatar_icon}
+              className="w-10 h-10 rounded-full object-cover"
+            />
+
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate
+                text-gray-800 dark:text-gray-200">
+                {user.fullName}
+              </p>
+
+              <p className={`text-xs ${
+                onlineusers?.includes(user._id.toString())
+                  ? 'text-green-500'
+                  : 'text-gray-400'
+              }`}>
+                {onlineusers?.includes(user._id.toString())
+                  ? 'online'
+                  : 'offline'}
+              </p>
             </div>
-            {unseenMessages[user._id] > 0 && <p className='absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-violet-500/50'>{unseenMessages[user._id]}</p>}
-          </div>
-         ) )}
-      </div>
 
+            {unseenMessages[user._id] > 0 && (
+              <div className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                {unseenMessages[user._id]}
+              </div>
+            )}
+
+          </div>
+        ))}
+
+      </div>
     </div>
   )
 }
+
+// 🔹 Menu Item
+const MenuItem = ({ icon, text, danger, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`flex items-center gap-3 px-4 py-2 text-sm cursor-pointer transition
+    hover:bg-gray-100 dark:hover:bg-[#2a3942]
+    ${danger ? 'text-red-500' : 'text-gray-700 dark:text-gray-200'}`}
+  >
+    <span className="text-lg">{icon}</span>
+    {text}
+  </div>
+)
 
 export default Sidebar
