@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 axios.defaults.baseURL = backendUrl;
 
 export const AuthContext = createContext();
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children })=>{
         setOnlineUsers([]);
         axios.defaults.headers.common["token"] = null;
         toast.success("Logged out successfully")
-        socket.disconnect();
+        socket?.disconnect();
     }
 
     // Update profile function to handle user profile updates 
@@ -78,7 +78,7 @@ export const AuthProvider = ({ children })=>{
  //    connect socket function to handle socket connection and online users updates
   const connectSocket = (userData)=>{
     if(!userData || socket?.connected) return;
-    const newSocket = new io(backendUrl, {
+    const newSocket = io(backendUrl, {
      query: {
         userId: userData._id,
      }
