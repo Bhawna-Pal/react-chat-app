@@ -45,7 +45,7 @@ io.on("connection", (socket)=>{
 // Middleware
 app.use(express.json({limit: '4mb'}));
 app.use(cors({
-    origin: FRONTEND_URL,
+    origin: "*",
     credentials: true
 }));
 
